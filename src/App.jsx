@@ -78,7 +78,7 @@ function App() {
         }
       }
     }
-  
+
     return parsedData;
   };
   
