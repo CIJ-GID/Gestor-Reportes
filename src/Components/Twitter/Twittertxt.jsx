@@ -4,10 +4,11 @@ import * as XLSX from "xlsx";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
-
+import { CircularProgress } from "@mui/material";
 
 function App() {
   const [parsedData, setParsedData] = useState([]);
+  const [processing, setProcessing] = useState(false);
 
   const handleFileUpload = (file) => {
     processReport(file);
@@ -104,6 +105,8 @@ function App() {
       return;
     }
 
+    setProcessing(true);
+
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(parsedData, {
       header: ["accountId", "createdAt", "loginIp", "org"],
@@ -126,11 +129,18 @@ function App() {
     link.href = url;
     link.download = "datos_procesados.xlsx";
     link.click();
+
+    setProcessing(false);
   };
 
   return (
     <div className="bg-principal w-screen h-screen flex items-center justify-center">
-      <h1 className="text-4xl mb-8 absolute top-0 transform -translate-x-1/2 left-1/2" style={{ color: 'white' }}>Reportes Twitter</h1>
+      <h1
+        className="text-4xl mb-8 absolute top-0 transform -translate-x-1/2 left-1/2"
+        style={{ color: "white" }}
+      >
+        Reportes Twitter
+      </h1>
       <div className="w-96 h-96 bg-white rounded-xl shadow-md p-8">
         <h1 className="text-3xl mb-4">Cargar Archivo</h1>
         <Button
@@ -141,12 +151,19 @@ function App() {
         >
           Exportar a Excel
         </Button>
+        {processing && (
+          <div className="flex justify-center mt-4">
+            <CircularProgress />
+          </div>
+        )}
         <FileUploader onFileUpload={handleFileUpload} />
       </div>
 
       <div className="absolute bottom-0 left-0 mb-4 ml-4">
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" color="primary">Volver al inicio</Button>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <Button variant="contained" color="primary">
+            Volver al inicio
+          </Button>
         </Link>
       </div>
     </div>

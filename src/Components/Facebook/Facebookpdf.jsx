@@ -18,6 +18,37 @@ function GooglePage() {
     setPdfFile(file);
   };
 
+  const extractDataFromPage = async (pageText) => {
+    const lines = [];
+    let time = "";
+    let ipAddress = "";
+    let org = "";
+
+    for (let i = 0; i < pageText.length; i++) {
+      const item = pageText[i];
+
+      if (item.includes("UTC")) {
+        time = item;
+      } else if (
+        item.match(
+          /^((\d{1,3}\.){3}\d{1,3})|(([\da-fA-F]{1,4}:){7}[\da-fA-F]{1,4})$/
+        )
+      ) {
+        ipAddress = item;
+        org = await getOrgFromIP(ipAddress);
+      }
+
+      if (time && ipAddress) {
+        lines.push([time, ipAddress, org]);
+        time = "";
+        ipAddress = "";
+        org = "";
+      }
+    }
+
+    return lines;
+  };
+
   const getOrgFromIP = async (ipAddress) => {
     try {
       const access_token = "814ee26772f463";
@@ -45,40 +76,14 @@ function GooglePage() {
       const pdf = await pdfjs.getDocument(typedArray).promise;
       const numPages = pdf.numPages;
 
-      let data = [["Timestamp", "IP Address", "org"]];
+      let data = [["Time", "IP Address", "org"]];
 
       for (let currentPage = 1; currentPage <= numPages; currentPage++) {
         const page = await pdf.getPage(currentPage);
         const content = await page.getTextContent();
         const pageText = content.items.map((item) => item.str.trim());
 
-        let timestamp = "";
-        let ipAddress = "";
-        let org = "";
-
-        const lines = [];
-
-        for (let i = 0; i < pageText.length; i++) {
-          const item = pageText[i];
-
-          if (item.includes("UTC")) {
-            timestamp = item;
-          } else if (
-            item.match(
-              /^((\d{1,3}\.){3}\d{1,3})|(([\da-fA-F]{1,4}:){7}[\da-fA-F]{1,4})$/
-            )
-          ) {
-            ipAddress = item;
-            org = await getOrgFromIP(ipAddress);
-          }
-
-          if (timestamp && ipAddress) {
-            lines.push([timestamp, ipAddress, org]);
-            timestamp = "";
-            ipAddress = "";
-            org = "";
-          }
-        }
+        const lines = await extractDataFromPage(pageText);
 
         if (lines.length > 0) {
           data.push(...lines);
@@ -106,7 +111,7 @@ function GooglePage() {
         className="text-4xl mb-8 absolute top-0 transform -translate-x-1/2 left-1/2"
         style={{ color: "white" }}
       >
-        Reportes Google
+        Reportes Facebook
       </h1>
       <div className="w-96 h-96 bg-white rounded-xl shadow-md p-8">
         <h1 className="text-3xl mb-4">Cargar Archivo</h1>
