@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 
-function App() {
+function Twitterpage() {
   const [parsedData, setParsedData] = useState([]);
   const [processing, setProcessing] = useState(false);
 
@@ -86,7 +86,18 @@ function App() {
           console.error("Error al obtener la información de la IP:", error);
         }
 
-        parsedData.push({ accountId, createdAt, loginIp, org });
+        const createdAtUTC = new Date(createdAt);
+        const createdAtBuenosAires = new Date(
+          createdAtUTC.getTime() - 3 * 60 * 60 * 1000
+        );
+
+        parsedData.push({
+          accountId,
+          createdAt: createdAtUTC.toISOString(),
+          "createdAt (Buenos Aires)": createdAtBuenosAires.toISOString(),
+          loginIp,
+          org,
+        });
       } catch (error) {
         console.error("Error al analizar el objeto JSON:", error);
       }
@@ -109,7 +120,13 @@ function App() {
 
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(parsedData, {
-      header: ["accountId", "createdAt", "loginIp", "org"],
+      header: [
+        "accountId",
+        "createdAt",
+        "createdAt (Buenos Aires)",
+        "loginIp",
+        "org",
+      ],
     });
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Datos procesados");
@@ -160,7 +177,7 @@ function App() {
       </div>
 
       <div className="absolute bottom-0 left-0 mb-4 ml-4">
-        <Link to="/" style={{ textDecoration: "none" }}>
+        <Link to="/home" style={{ textDecoration: "none" }}>
           <Button variant="contained" color="primary">
             Volver al inicio
           </Button>
@@ -170,4 +187,4 @@ function App() {
   );
 }
 
-export default App;
+export default Twitterpage;

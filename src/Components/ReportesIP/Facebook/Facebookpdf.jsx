@@ -6,10 +6,11 @@ import { saveAs } from "file-saver";
 import { utils, write } from "xlsx";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
+import moment from "moment";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-function GooglePage() {
+function facebookPage() {
   const [pdfFile, setPdfFile] = useState(null);
   const [processing, setProcessing] = useState(false);
 
@@ -20,7 +21,7 @@ function GooglePage() {
 
   const extractDataFromPage = async (pageText) => {
     const lines = [];
-    let time = "";
+    let timestamp = "";
     let ipAddress = "";
     let org = "";
 
@@ -28,7 +29,7 @@ function GooglePage() {
       const item = pageText[i];
 
       if (item.includes("UTC")) {
-        time = item;
+        timestamp = item;
       } else if (
         item.match(
           /^((\d{1,3}\.){3}\d{1,3})|(([\da-fA-F]{1,4}:){7}[\da-fA-F]{1,4})$/
@@ -38,9 +39,9 @@ function GooglePage() {
         org = await getOrgFromIP(ipAddress);
       }
 
-      if (time && ipAddress) {
-        lines.push([time, ipAddress, org]);
-        time = "";
+      if (timestamp && ipAddress) {
+        lines.push([timestamp, ipAddress, org]);
+        timestamp = "";
         ipAddress = "";
         org = "";
       }
@@ -62,6 +63,15 @@ function GooglePage() {
     }
   };
 
+  const convertToBuenosAiresTime = (timestamp) => {
+    const utcDateTime = moment.utc(timestamp, "YYYY-MM-DD HH:mm:ss");
+    const buenosAiresDateTime = utcDateTime
+      .utcOffset(-180) // UTC-3:00 (Buenos Aires)
+      .format("YYYY-MM-DD HH:mm:ss");
+
+    return buenosAiresDateTime;
+  };
+
   const exportToExcel = async () => {
     if (!pdfFile) {
       console.log("No hay archivo PDF cargado.");
@@ -76,7 +86,7 @@ function GooglePage() {
       const pdf = await pdfjs.getDocument(typedArray).promise;
       const numPages = pdf.numPages;
 
-      let data = [["Time", "IP Address", "org"]];
+      let data = [["Time(UTC)", "Time (Buenos Aires)", "IP Address", "org"]];
 
       for (let currentPage = 1; currentPage <= numPages; currentPage++) {
         const page = await pdf.getPage(currentPage);
@@ -86,7 +96,11 @@ function GooglePage() {
         const lines = await extractDataFromPage(pageText);
 
         if (lines.length > 0) {
-          data.push(...lines);
+          lines.forEach((line) => {
+            const [timestamp, ipAddress, org] = line;
+            const buenosAiresTime = convertToBuenosAiresTime(timestamp);
+            data.push([timestamp, buenosAiresTime, ipAddress, org]);
+          });
         }
       }
 
@@ -125,7 +139,7 @@ function GooglePage() {
           </div>
         )}
         <div className="absolute bottom-0 left-0 mb-4 ml-4">
-          <Link to="/" style={{ textDecoration: "none" }}>
+          <Link to="/home" style={{ textDecoration: "none" }}>
             <Button variant="contained" color="primary">
               Volver al inicio
             </Button>
@@ -136,4 +150,4 @@ function GooglePage() {
   );
 }
 
-export default GooglePage;
+export default facebookPage;
