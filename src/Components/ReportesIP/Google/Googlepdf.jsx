@@ -110,7 +110,21 @@ function GooglePage() {
       setProcessing(false);
     };
 
+    fileReader.onerror = function (event) {
+      const { target: { error } } = event;
+      if (error && error.code === 18) {
+        handleAdblockerError();
+      }
+    };
+
     fileReader.readAsArrayBuffer(pdfFile);
+  };
+
+  const handleAdblockerError = () => {
+    console.log('El recurso fue bloqueado por el adblocker');
+    window.alert(
+      'Por favor, desactiva el bloqueador de anuncios (adblocker) para que la web funcione correctamente',
+    );
   };
 
   return (
@@ -124,6 +138,7 @@ function GooglePage() {
       <div className="w-96 h-96 bg-white rounded-xl shadow-md p-8">
         <h1 className="text-3xl mb-4">Cargar Archivo</h1>
         <input type="file" onChange={handleFileUpload} />
+
         <Button variant="contained" onClick={exportToExcel}>
           Exportar a Excel
         </Button>
