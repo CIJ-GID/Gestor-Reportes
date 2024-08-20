@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import Home from './Components/ReportesIP/home';
 import GooglePage from './Components/ReportesIP/Google/Googlepdf';
-import TwitterPage from './Components/ReportesIP/Twitter/Rwittertxt';
+import TwitterPage from './Components/ReportesIP/Twitter/Twittertxt';
 import FacebookPage from './Components/ReportesIP/Facebook/Facebookpdf';
 
 const HomePage = () => {
