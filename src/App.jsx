@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import Home from './Components/ReportesIP/home';
-import GooglePage from './Components/ReportesIP/Google/googlepdf';
-import TwitterPage from './Components/ReportesIP/Twitter/twittertxt';
-import FacebookPage from './Components/ReportesIP/facebook/facebookpdf';
+import GooglePage from './Components/ReportesIP/Google/Googlepdf';
+import TwitterPage from './Components/ReportesIP/Twitter/Rwittertxt';
+import FacebookPage from './Components/ReportesIP/Facebook/Facebookpdf';
 
 const HomePage = () => {
   return (
