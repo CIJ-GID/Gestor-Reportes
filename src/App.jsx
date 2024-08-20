@@ -29,12 +29,6 @@ const HomePage = () => {
         >
           Reportes-IP
         </Button>
-
-        <a href="http://10.190.12.146:3000" about="_blank">
-          <Button to="#" variant="contained" sx={{ mr: 2 }}>
-            Consultas-IP
-          </Button>
-        </a>
       </Box>
     </div>
   );
